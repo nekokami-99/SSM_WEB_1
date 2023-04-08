@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+    namespace:名称空间
+    可以用于修改别名
+    如驼峰命名
+-->
+<mapper namespace="com.itheima.mapper.AcMapper">
+
+<resultMap id="acresultMap" type="AC">
+
+</resultMap>
+
+
+
+    <select id="selectAll1" resultMap="acresultMap">
+select *
+from s_student;
+
+</select>
+
+    <select id="selectAllSid" resultMap="acresultMap">
+        select *
+        from s_school;
+
+    </select>
+        <!--
+                *参数占位符：
+                1.#{} 替换为？：为了防止 SQL注入
+                2.${} 拼Sql 会存在sql注入问题
+                传参时使用#{}
+
+                *
+        -->
+<select id="selectById1" resultMap="acresultMap">
+select *
+from s_student where id=#{id};
+
+</select>
+
+        <!--
+                条件查询
+        -->
+        <!--
+        <select id="selectByCondition" resultMap="brandresultMap">
+            select *
+            from tb_brand
+            where status = #{status}
+              and company_name like #{companyName}
+              and brand_name like #{brandName}
+
+        </select>
+    -->
+        <!--
+            动态查询
+            *if：完成对应条件判断
+            *text：逻辑表达式
+
+            *问题 ：不能 where 接 and
+            1.恒等式 where = 1
+            2.<where>关键词
+        -->
+
+<select id="selectByCondition1" resultMap="acresultMap">
+select *
+from tb_brand
+
+<where>
+    <if test="hours != null  ">
+        and hours = #{hours}
+    </if>
+
+    <if test=" name != null and name != ''">
+        and name like #{name}
+    </if>
+
+    <if test="sid != null  ">
+        and sid like #{sid}
+    </if >
+
+</where>
+
+</select>
+
+<select id="selectByCS1" resultMap="acresultMap">
+select  *
+from s_student
+where
+<choose>
+
+    <when test="name != null and name != ''">
+        and name = #{name}
+    </when>
+
+    <when test="hours != null ">
+        and hours like #{hours}
+    </when>
+
+    <when test="sid != null ">
+        and sid like #{sid}
+    </when>
+    <otherwise>
+        where 1 = 1;
+    </otherwise>
+</choose>
+
+</select>
+
+
+
+
+        <!--
+        *添加
+        -->
+<insert id="add1" useGeneratedKeys="true" keyProperty="id">
+insert into s_student(name, hours, sid)
+values (#{name},#{hours},#{sid})
+
+</insert>
+
+        <!--
+        *修改
+        -->
+    <update id="update1">
+        update s_student
+        <set>
+
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+
+            <if test=" hours != null">
+                hours = #{hours},
+            </if>
+
+            <if test="sid != null ">
+                 sid = #{sid},
+            </if >
+
+        </set>
+            where id = #{id};
+    </update>
+
+
+    <delete id="deleteById1">
+        delete from s_student
+        where id = #{id};
+    </delete>
+<!--
+*   批量删除
+-->
+
+    <delete id="deleteByIds1">
+        delete from s_student where id
+        in (
+            <foreach collection="array" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+                                               )
+
+    </delete>
+
+
+
+</mapper>
